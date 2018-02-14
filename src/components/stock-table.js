@@ -5,7 +5,9 @@ const StockTable = props => {
 	const quotes = props.quotes.map(quote =>
 		<tr key={quote.symbol}>
 			<td>
-				<a href={`https://stocktwits.com/symbol/${quote.symbol.toUpperCase()}`} target="_blank">{quote.symbol} &#8599;</a>
+				<a href={`https://stocktwits.com/symbol/${quote.symbol.toUpperCase()}`} target="_blank">
+					{quote.symbol} &#8599;
+				</a>
 			</td>
 			<td>{quote.companyName}</td>
 			<td>${quote.latestPrice.toFixed(2)}</td>
@@ -41,7 +43,7 @@ const StockTable = props => {
 					<td>Change</td>
 				</tr>
 			</thead>
-			<tbody className="ignore-stripe">
+			<tbody>
 				{!props.isLoading ? quotes : loadingMessage}
 			</tbody>
 		</table>
