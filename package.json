@@ -1,0 +1,40 @@
+{
+  "name": "stock-watch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:app": "browserify ./src/app.js -o ./dist/app.js -t [ babelify ] -t [ localenvify --envfile .env ]",
+    "build:loader": "browserify ./src/loader.js -o ./dist/loader.js -t [ babelify ] -t [ localenvify --envfile .env ]",
+    "build:js": "npm run build:app && npm run build:loader",
+    "build:css": "node-sass ./src/css/app.css ./dist/app.css",
+    "minify:app": "minify ./dist/app.js --out-file ./dist/app.js --mangle false",
+    "minify:loader": "minify ./dist/loader.js --out-file ./dist/loader.js --mangle true",
+    "build": "npm run build:js && npm run build:css",
+    "build:prod": "npm run build && npm run minify:app && npm run minify:loader",
+    "server": "node server.js",
+    "start": "npm run build && npm run server",
+    "start:prod": "npm run build:prod && npm run server"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "axios": "^0.17.1",
+    "babel-core": "^6.26.0",
+    "babel-minify": "^0.2.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babelify": "^8.0.0",
+    "browserify": "^14.5.0",
+    "localenvify": "^1.0.1",
+    "node-sass": "^4.7.2",
+    "react": "^16.2.0",
+    "react-basic-state": "0.0.5",
+    "react-dom": "^16.2.0",
+    "react-tap-or-click": "^0.2.1"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0"
+  }
+}
