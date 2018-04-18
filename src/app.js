@@ -1,50 +1,50 @@
 import "babel-polyfill"
+
 import React from "react"
 import ReactDOM from "react-dom"
+import {createStore} from "redux"
+import {Provider} from "react-redux"
+
 import getQuotes from "./get-quotes"
-import StockTable from "./components/stock-table"
-import AppState from "./app-state"
+import actionTypes from "./action-types"
+import rootReducer from "./reducers"
+import StockTable from "./containers/stock-table"
 
-const StateContainer = AppState.container
+const refreshSeconds = parseInt(process.env.REFRESH_SECONDS || "30", 10)
 const symbols = (process.env.SYMBOLS || "").split(",").map(symbol => symbol.toLowerCase())
+const store = createStore(rootReducer)
 
-const pollStockData = symbols => {
-	let isFetching = false
-	const delaySeconds = .5
-	const refreshSeconds = 60
-	const resetState = (quotes, isLoading) => () => ({quotes, isLoading})
-
-	const refreshData = () => {
-		if (!isFetching) {
-			isFetching = true
-			AppState.update(resetState([], true))
-
-			getQuotes(symbols).then(
-				quotes => {
-					setTimeout(() => {
-						isFetching = false
-						AppState.update(resetState(quotes, false))
-					}, delaySeconds * 1000)
-				},
-				() => {
-					setTimeout(() => {
-						isFetching = false
-						AppState.update(resetState([], false))
-					}, delaySeconds * 1000)
-				}
-			)
+const refreshData = symbols => (
+	new Promise((resolve, reject) => {
+		const onDone = quotes => {
+			store.dispatch({type: actionTypes.SET_QUOTES, quotes: quotes || []})
+			resolve()
 		}
-	}
 
-	refreshData()
-	setInterval(() => refreshData(), refreshSeconds * 1000)
-}
-
-ReactDOM.render(
-	<StateContainer>
-		<StockTable/>
-	</StateContainer>,
-	document.getElementById("app")
+		getQuotes(symbols).then(onDone, onDone)
+	})
 )
 
-pollStockData(symbols)
+const init = (symbols, refreshSeconds) => {
+	refreshData(symbols).then(() => {
+		let isFetching = false
+
+		setInterval(() => {
+			const onDone = () => isFetching = false
+
+			if (!isFetching) {
+				isFetching = true
+				refreshData(symbols).then(onDone, onDone)
+			}
+		}, refreshSeconds * 1000)
+
+		ReactDOM.render(
+			<Provider store={store}>
+				<StockTable />
+			</Provider>,
+			document.getElementById("app")
+		)
+	})
+}
+
+init(symbols, refreshSeconds)

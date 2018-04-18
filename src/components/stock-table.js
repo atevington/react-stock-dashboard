@@ -1,5 +1,4 @@
 import React from "react"
-import AppState from "../app-state"
 
 const StockTable = props => {
 	const quotes = props.quotes.map(quote =>
@@ -15,14 +14,6 @@ const StockTable = props => {
 				<span dangerouslySetInnerHTML={{__html: quote.change < 0 ? "&darr;" : "&uarr;"}} />{" "}
 				${quote.change.toFixed(2)}{" "}
 				({(quote.changePercent * 100).toFixed(2)}%)
-			</td>
-		</tr>
-	)
-
-	const loadingMessage = (
-		<tr>
-			<td colSpan="4" style={{textAlign: "center"}}>
-				<img src="loading.gif" />
 			</td>
 		</tr>
 	)
@@ -44,12 +35,10 @@ const StockTable = props => {
 				</tr>
 			</thead>
 			<tbody>
-				{!props.isLoading ? quotes : loadingMessage}
+				{quotes}
 			</tbody>
 		</table>
 	)
 }
 
-const wrapped = AppState.wrap(StockTable, {quotes: state => state.quotes, isLoading: state => state.isLoading})
-
-export default wrapped
+export default StockTable
